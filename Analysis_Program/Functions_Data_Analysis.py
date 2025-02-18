@@ -156,16 +156,13 @@ def calculate_spectrogram_data(frequencies, data_segments, time_array, is_psd=Fa
     # Compensation for PSD
     if is_psd:
         # Softer compensation with lower exponent
-        freq_compensation = frequencies_reduced**2  # or frequencies_reduced**1.5
+        freq_compensation = frequencies_reduced**3  # or frequencies_reduced**1.5
         data_reduced = np.log10(data_reduced * freq_compensation[np.newaxis, :])
         
         # Normalization by frequency band
         for i in range(len(frequencies_reduced)):
             data_reduced[:, i] = (data_reduced[:, i] - np.mean(data_reduced[:, i])) / np.std(data_reduced[:, i])
         
-        # Additional normalization to increase contrast
-        data_reduced = (data_reduced - np.mean(data_reduced)) * 1.5 + np.mean(data_reduced)
-    
     # Smooth data
     smoothed_data = np.zeros_like(data_reduced)
     for i in range(data_reduced.shape[0]):

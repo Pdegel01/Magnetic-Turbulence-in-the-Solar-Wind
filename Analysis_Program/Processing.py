@@ -141,9 +141,7 @@ def create_figure_1(df_filtered):
     colors = {'B_R': '#ffb3b3', 'B_T': '#b3ffb3', 'B_N': '#b3b3ff', 'B': 'black'}
     for comp, color in colors.items():
         plt.plot(df_filtered.index, df_filtered[comp], label=comp, color=color)
-    '''
     plt.title(f'Magnetic Field Evolution\n{start_date}\nfrom {start_time} → {end_time}')
-    '''
     plt.xlabel('Time')
     plt.xticks(rotation=45)
     plt.xlim(df_filtered.index[0], df_filtered.index[-1])
@@ -201,28 +199,24 @@ def create_figure_2(frequencies, psd_segments, noise_3_sigma, low_filtred_limit,
     │       a certain range.                  │
     └─────────────────────────────────────────┘
     """
-    # Font size settings
-    SMALL_SIZE = 12
-    MEDIUM_SIZE = 14
-    BIGGER_SIZE = 16
-
+    # Font size settings - modifications ici pour augmenter la taille des valeurs sur les axes
+    SMALL_SIZE, MEDIUM_SIZE, BIGGER_SIZE = 14, 16, 18
+    
     plt.rc('font', size=SMALL_SIZE)
     plt.rc('axes', titlesize=BIGGER_SIZE)
     plt.rc('axes', labelsize=MEDIUM_SIZE)
-    plt.rc('xtick', labelsize=SMALL_SIZE)
-    plt.rc('ytick', labelsize=SMALL_SIZE)
+    plt.rc('xtick', labelsize=MEDIUM_SIZE)  # Augmentation de la taille des étiquettes des graduations sur l'axe X
+    plt.rc('ytick', labelsize=MEDIUM_SIZE)  # Augmentation de la taille des étiquettes des graduations sur l'axe Y
     plt.rc('legend', fontsize=MEDIUM_SIZE)
     
     fig = plt.figure(figsize=(12, 10))
     gs = gridspec.GridSpec(2, 1, height_ratios=[1, 1])
     
     # Ensure noise_3_sigma is interpolated to match the frequency size
-
     if len(frequencies) != len(noise_3_sigma):
         noise_3_sigma = np.interp(frequencies, noise_data['frequency'], noise_3_sigma)
     
     # ──────────────────────── All PSD segments ────────────────────────
-
     ax1 = fig.add_subplot(gs[0])
     
     # Smoothing and segments Representation
@@ -247,15 +241,12 @@ def create_figure_2(frequencies, psd_segments, noise_3_sigma, low_filtred_limit,
     
     ax1.set_xlabel('Frequency [Hz]')
     ax1.set_ylabel('PSD [(nT)²/Hz]')
-    '''
     ax1.set_title(f'Power Spectral Density - {len(psd_segments)} Segments')
-    '''
     ax1.grid(True)
     ax1.set_xlim(0.2, 100)
     ax1.legend(bbox_to_anchor=(1.02, 1), loc='upper left')
     
     # ──────────────────────── Filtred PSD segments ────────────────────────
-
     ax2 = fig.add_subplot(gs[1])
     
     mask_noise = (frequencies >= low_filtred_limit) & (frequencies <= high_filtred_limit)
@@ -283,9 +274,7 @@ def create_figure_2(frequencies, psd_segments, noise_3_sigma, low_filtred_limit,
     
     ax2.set_xlabel('Frequency [Hz]')
     ax2.set_ylabel('PSD [(nT)²/Hz]')
-    '''
     ax2.set_title(f'Power Spectral Density Filtred - {len(valid_segments)} Segments')
-    '''
     ax2.grid(True)
     ax2.legend(bbox_to_anchor=(1.02, 1), loc='upper left')
     ax2.set_xlim(0.2, 100)
@@ -328,12 +317,12 @@ def create_figure_3(df_filtered, frequencies_psd, psd_segments,
     │     Displays spectrograms of PSD, helicity and angle.   │
     └─────────────────────────────────────────────────────────┘
     """
-    # Set font sizes
-    SMALL_SIZE, MEDIUM_SIZE, BIGGER_SIZE = 12, 14, 16
+    # Set font sizes with increased values
+    SMALL_SIZE, MEDIUM_SIZE, BIGGER_SIZE = 14, 16, 18  # Modified sizes
     plt.rc('font', size=SMALL_SIZE)
     plt.rc('axes', titlesize=BIGGER_SIZE, labelsize=MEDIUM_SIZE)
-    plt.rc('xtick', labelsize=SMALL_SIZE)
-    plt.rc('ytick', labelsize=SMALL_SIZE)
+    plt.rc('xtick', labelsize=MEDIUM_SIZE)  # Increased x-tick labels
+    plt.rc('ytick', labelsize=MEDIUM_SIZE)  # Increased y-tick labels
     plt.rc('legend', fontsize=MEDIUM_SIZE)
 
     start_time = df_filtered.index[0].strftime("%H:%M")
@@ -353,7 +342,6 @@ def create_figure_3(df_filtered, frequencies_psd, psd_segments,
                             psd_data['data'].T, cmap='viridis',
                             norm=plt.Normalize(vmin=-4, vmax=4), shading='auto')
 
-
     axs[0].set_yscale('log')
     axs[0].set_ylim(1e-1, 1e2)
     axs[0].xaxis.set_major_formatter(DateFormatter('%H:%M'))
@@ -362,7 +350,7 @@ def create_figure_3(df_filtered, frequencies_psd, psd_segments,
     axs[0].tick_params(labelbottom=False)
 
     cbar1 = fig.colorbar(im1, ax=axs[0], orientation='vertical', pad=0.02)
-    cbar1.set_label('log₁₀(PSD) [(nT)²/Hz]')
+    cbar1.set_label('log₁₀(PSD) [(nT)²/Hz]', size=MEDIUM_SIZE)  # Explicit size
 
     # ──────────────────────── Helicity Spectrogram ────────────────────────
 
@@ -383,7 +371,7 @@ def create_figure_3(df_filtered, frequencies_psd, psd_segments,
     axs[1].tick_params(labelbottom=False)
 
     cbar2 = fig.colorbar(im2, ax=axs[1], orientation='vertical', pad=0.02)
-    cbar2.set_label('Helicity')
+    cbar2.set_label('Helicity', size=MEDIUM_SIZE)  # Explicit size
 
     # ──────────────────────── θBR Angle Plot ────────────────────────
 
@@ -409,12 +397,12 @@ def create_figure_3(df_filtered, frequencies_psd, psd_segments,
     axs[2].yaxis.set_minor_locator(MultipleLocator(15))
     axs[2].tick_params(axis='x', rotation=45)
 
-    # Synchroniser les limites x
+    # Synchronize x-axis limits
     axs[2].set_xlim(axs[0].get_xlim())
 
     plt.show()
     print(f'Min θBR: {theta_BR_deg.min()}°, Max θBR: {theta_BR_deg.max()}°')
-
+    
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 #        PSD and Helicity filtred        #
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
@@ -457,6 +445,14 @@ def create_figure_4(frequencies, psd_segments, helicity_freqs, helicity_segments
     │     for PSD and helicity.                     │
     └───────────────────────────────────────────────┘
     """
+    # Set font sizes with increased values
+    SMALL_SIZE, MEDIUM_SIZE, BIGGER_SIZE = 14, 16, 18  # Modified sizes
+    plt.rc('font', size=SMALL_SIZE)
+    plt.rc('axes', titlesize=BIGGER_SIZE, labelsize=MEDIUM_SIZE)
+    plt.rc('xtick', labelsize=MEDIUM_SIZE)  # Increased x-tick labels
+    plt.rc('ytick', labelsize=MEDIUM_SIZE)  # Increased y-tick labels
+    plt.rc('legend', fontsize=MEDIUM_SIZE)
+
     print('low_limit_cyclo = ' + str(low_limit_cyclo))
     print('high_limit_cyclo =' + str(high_limit_cyclo))
     print('low_limit_w = ' + str(low_limit_w))
@@ -468,7 +464,7 @@ def create_figure_4(frequencies, psd_segments, helicity_freqs, helicity_segments
         noise_3_sigma = np.interp(frequencies, noise_data['frequency'], noise_3_sigma)
 
     # Create the main figure with a 2x2 grid layout
-    fig = plt.figure(figsize=(20, 10))
+    fig = plt.figure(figsize=(24, 12))
     gs = plt.GridSpec(2, 2, width_ratios=[1, 1], height_ratios=[1, 1])
     
     # === Compute helicity-based filtering (cyclo) ===
@@ -491,18 +487,11 @@ def create_figure_4(frequencies, psd_segments, helicity_freqs, helicity_segments
     filtered_segments = high_helicity | high_helicity_1
     remaining_segments = ~filtered_segments
 
-    print('Segments filtrés:', np.sum(filtered_segments))
-    print('Segments restants:', np.sum(remaining_segments))
-
-    # Print of informations
-    n_high = np.sum(high_helicity)
-    print('n_high : ', n_high)
-    n_low = np.sum(~high_helicity)
-    print('n_low : ', n_low)
-    
-    n1_high = np.sum(high_helicity_1)
-    print('n1_high : ', n1_high)
-    n1_low = np.sum(~high_helicity_1)
+    # Informations
+    print("\nfirst case (without filtre):")
+    print(f"blue segments (cyclotron): {np.sum(high_helicity)}")
+    print(f"red segments (whistler): {np.sum(high_helicity_1)}")
+    print(f"remaining segments: {np.sum(remaining_segments)}")
 
     # ──────────────────────── Left Side (All Segments) ────────────────────────
 
@@ -589,10 +578,11 @@ def create_figure_4(frequencies, psd_segments, helicity_freqs, helicity_segments
     filtered_segments_noise = high_helicity_noise | high_helicity_noise_1
     remaining_segments_noise = above_noise_mask & (~filtered_segments_noise)
 
-    n_high_noise = np.sum(high_helicity_noise)
-    n_high_noise = np.sum(high_helicity_noise)
-    n_high_noise_1 = np.sum(high_helicity_noise_1)
-    n_remaining_noise = np.sum(remaining_segments_noise)
+    # Informations
+    print("\n2nd case (with filter):")
+    print(f"blue segments (cyclotron): {np.sum(high_helicity_noise)}")
+    print(f"red segments (whistler): {np.sum(high_helicity_noise_1)}")
+    print(f"remaining segments: {np.sum(remaining_segments_noise)}")
 
     # First right subplot: Filtered PSD
     ax3 = fig.add_subplot(gs[0, 1])
@@ -666,6 +656,19 @@ def create_figure_4(frequencies, psd_segments, helicity_freqs, helicity_segments
         print(f"Mean PSD in the 3-4 Hz band: {mean_psd:.2e}")
         print(f"Mean noise level in the 3-4 Hz band: {mean_noise:.2e}")
 
+    # Fine adjustment of margins
+    fig.subplots_adjust(left=0.12, right=0.98, top=0.90, bottom=0.15, wspace=0.3, hspace=0.4)
+
+    # Example of adjustment on a sub-plot (repeat for each sub-plot)
+    ax1.yaxis.set_label_coords(-0.15, 0.5)  # More significant movement
+    ax3.yaxis.set_label_coords(-0.15, 0.5)
+
+    # Moving the x titles
+    ax1.xaxis.set_label_coords(0.5, -0.2) 
+    ax3.xaxis.set_label_coords(0.5, -0.2)
+    ax2.xaxis.set_label_coords(0.5, -0.2)
+    ax4.xaxis.set_label_coords(0.5, -0.2)
+    
     plt.show()
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
@@ -707,40 +710,42 @@ def create_figure_5(frequencies_helicity, helicity_segments, segment_times, freq
     │     - Power Spectral Density vs time.            │
     └──────────────────────────────────────────────────┘
     """
-    bands = [(low_limit_cyclo, high_limit_cyclo), (low_limit_w, high_limit_w)]  # Définition des bandes à l'intérieur de la fonction
+    # Set font sizes with increased values
+    SMALL_SIZE, MEDIUM_SIZE, BIGGER_SIZE = 14, 16, 18  # Modified sizes
+    plt.rc('font', size=SMALL_SIZE)
+    plt.rc('axes', titlesize=BIGGER_SIZE, labelsize=MEDIUM_SIZE)
+    plt.rc('xtick', labelsize=MEDIUM_SIZE)  # Increased x-tick labels
+    plt.rc('ytick', labelsize=MEDIUM_SIZE)  # Increased y-tick labels
+    plt.rc('legend', fontsize=MEDIUM_SIZE)
+
+    bands = [(low_limit_cyclo, high_limit_cyclo), (low_limit_w, high_limit_w)]  # Define frequency bands
 
     fig, axes = plt.subplots(2, 1, figsize=(12, 10), sharex=True)
     
-    # First subplot : Hélicité
+    # First subplot: Mean Magnetic Helicity
     for f_min, f_max in bands:
         band_indices = np.where((frequencies_helicity >= f_min) & (frequencies_helicity <= f_max))[0]
         mean_helicity = np.mean(helicity_segments[:, band_indices], axis=1)
-        '''
-        smoothed_mean_helicity = smooth_data(mean_helicity, window_size=20)
-        '''
         axes[0].plot(segment_times[:len(mean_helicity)], mean_helicity, label=f'{f_min}-{f_max} Hz')
     
-    axes[0].set_ylabel('Mean Magnetic Helicity')
+    axes[0].set_ylabel('Mean Magnetic Helicity', fontsize=MEDIUM_SIZE)
     axes[0].set_title('Magnetic Helicity in Frequency Bands vs Time')
     axes[0].legend()
     axes[0].grid(True)
     
-    # Second subplot : PSD
+    # Second subplot: Power Spectral Density (PSD)
     for f_min, f_max in bands:
         band_indices = np.where((frequencies_psd >= f_min) & (frequencies_psd <= f_max))[0]
         mean_psd = np.mean(psd_segments[:, band_indices], axis=1)
-        '''
-        smoothed_mean_helicity = smooth_data(mean_helicity, window_size=20)
-        '''
         axes[1].plot(segment_times[:len(mean_psd)], mean_psd, label=f'{f_min}-{f_max} Hz')
     
     axes[1].set_yscale('log')
-    axes[1].set_xlabel('Time')
-    axes[1].set_ylabel('Power Spectral Density (PSD)')
-    axes[1].set_title('Power Spectral Density vs Time')
+    axes[1].set_xlabel('Time', fontsize=MEDIUM_SIZE)
+    axes[1].set_ylabel('Power Spectral Density (PSD)', fontsize=MEDIUM_SIZE)
     axes[1].legend()
     axes[1].grid(True)
     
+    # Adjust layout and display
     plt.tight_layout()
     plt.show()
 
@@ -751,18 +756,15 @@ def create_figure_5(frequencies_helicity, helicity_segments, segment_times, freq
 
 
   #    ---  Figure of Magnetic Field Evolution  ---
-'''
 create_figure_1(df_filtered)
-'''
+
   #    ---  Figure of PSD  ---
-'''
 create_figure_2(frequencies_psd, psd_segments, noise_3_sigma, low_filtred_limit, high_filtred_limit)
-'''
-'''
+
   #    ---  Spectrograms of PSD and Helicity  ---
 create_figure_3(df_filtered, frequencies_psd, psd_segments, 
                frequencies_helicity, helicity_segments, theta_BR, window_size=30)
-'''
+
   #    ---  Figure of Helicity with filtered segments  ---
 create_figure_4(frequencies_psd, psd_segments, frequencies_helicity, helicity_segments, noise_3_sigma, low_limit_cyclo, high_limit_cyclo, low_limit_w, high_limit_w, low_filtred_limit, high_filtred_limit)
 
